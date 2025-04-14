@@ -2,11 +2,32 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var isMoodModalPresented: Bool = false
-    @State private var selectedMoodIcon: String = "Mascarade"
+    @State private var currentMoodIcon: String = "Mascarade"
+    @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = ""
+    private let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+    
+    private func updateCurrentMoodIcon() {
+        let savedTime = defaults?.object(forKey: "selectedMoodSavedTime") as? Date ?? Date.distantPast
+        let now = Date()
+        
+        if now.timeIntervalSince(savedTime) > 3 * 60 * 60 {
+            defaults?.removeObject(forKey: "selectedMoodType")
+            defaults?.removeObject(forKey: "selectedMoodSavedTime")
+            currentMoodIcon = "Mascarade"
+        } else {
+            if storedMoodType.isEmpty {
+                currentMoodIcon = "Mascarade"
+            } else if let mood = MoodType(rawValue: storedMoodType) {
+                currentMoodIcon = mood.iconName
+            } else {
+                currentMoodIcon = "Mascarade"
+            }
+        }
+    }
     
     var body: some View {
         ZStack {
-            Map()
+            MapView()
             HomeViewGradation()
             
             VStack {
@@ -28,17 +49,16 @@ struct HomeView: View {
                            .resizable()
                            .frame(width: 100, height: 100)
                            
-                        Image(selectedMoodIcon)
+                        Image(currentMoodIcon)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: selectedMoodIcon == "Mascarde" ? 58 : 53)
-                            .padding(.leading, selectedMoodIcon == "Mascarde" ? 20 : 3)
-                            .padding(.top, selectedMoodIcon == "Mascarde" ? 0 : 5)
+                            .frame(width: currentMoodIcon == "Mascarade" ? 58 : 53)
+                            .padding(.leading, currentMoodIcon == "Mascarade" ? 10 : 3)
+                            .padding(.top, currentMoodIcon == "Mascarade" ? 0 : 5)
                     }
                     .onTapGesture {
                         isMoodModalPresented = true
                     }
-                     
                     
                     Image("LocationButton")
                         .resizable()
@@ -46,9 +66,15 @@ struct HomeView: View {
                 }
                 .padding(.bottom)
                 .sheet(isPresented: $isMoodModalPresented) {
-                    MoodModalView(selectedMoodIcon: $selectedMoodIcon)
+                    MoodModalView()
                 }
             }
+        }
+        .onAppear {
+            updateCurrentMoodIcon()
+        }
+        .onChange(of: storedMoodType) { oldValue, newValue in
+            updateCurrentMoodIcon()
         }
     }
 }

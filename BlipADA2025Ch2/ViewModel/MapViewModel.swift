@@ -11,13 +11,17 @@ class MapViewModel: ObservableObject {
 
     init() {
         generatePeople()
+        savePeopleToUserDefaults()
+        checkSavedPeople()
     }
 
     private func generatePeople() {
-        // 유저 사진 많아지면 여기 숫자 수정
-        people = (1...7).map { index in
+        // 유저 추가되면 여기 닉네임 추가
+        let nicknames = ["JudyJ", "Glowny","Taeni", "Ito", "Wonjun", "Air", "Ken"]
+        let statusIcons: [String?] = ["RedIcon", "YellowIcon", "GreenIcon", nil]
+        people = (1...nicknames.count).map { index in
+            let nickname = nicknames[index - 1]
             let userImageName = "User\(index)"
-            let statusIcons = ["RedIcon", "YellowIcon", "GreenIcon"]
             let randomStatusIcon = statusIcons.randomElement()!
 
             let randomPoint1 = CGPoint(x: CGFloat.random(in: 20...2000), y: CGFloat.random(in: 100...1200))
@@ -26,6 +30,7 @@ class MapViewModel: ObservableObject {
             let randomPath: [CGPoint] = [randomPoint1, randomPoint2, randomPoint3]
 
             return Person(
+                nickname: nickname,
                 path: randomPath,
                 currentPositionIndex: 0,
                 speed: Double.random(in: 0.08...0.6),
@@ -34,7 +39,7 @@ class MapViewModel: ObservableObject {
             )
         }
     }
-
+    
     func updatePeoplePositions() {
         for index in people.indices {
             var person = people[index]
@@ -59,4 +64,36 @@ class MapViewModel: ObservableObject {
             people[index] = person
         }
     }
+    
+    func checkSavedPeople() {
+        let userDefaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+        if let data = userDefaults?.data(forKey: "peopleData"),
+           let decoded = try? JSONDecoder().decode([Person].self, from: data) {
+            print("✅ 저장된 사람 수: \(decoded.count)")
+            if let first = decoded.first {
+                print("✅ 첫번째 사람 닉네임:", first.nickname)
+            }
+        } else {
+            print("❗ 저장된 peopleData가 없습니다.")
+        }
+    }
+    
+    func savePeopleToUserDefaults() {
+        if let data = try? JSONEncoder().encode(people) {
+            let userDefaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+            userDefaults?.set(data, forKey: "peopleData")
+            print("✅ peopleData 저장 완료, 저장된 사람 수: \(people.count)")
+            
+            // 저장 후 바로 확인
+            if let savedData = userDefaults?.data(forKey: "peopleData"),
+               let decoded = try? JSONDecoder().decode([Person].self, from: savedData) {
+                print("✅ 저장 직후 읽은 사람 수: \(decoded.count)")
+            } else {
+                print("❗ 저장 직후 읽기 실패")
+            }
+        } else {
+            print("❗ peopleData 저장 실패")
+        }
+    }
+
 }

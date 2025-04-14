@@ -11,7 +11,7 @@ import SwiftUI
 struct BlipADA2025Ch2App: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            SplashView()
         }
     }
 }

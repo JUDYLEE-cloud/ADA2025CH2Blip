@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Alexandria-Black.ttf</string>
+		<string>Alexandria-Bold.ttf</string>
+		<string>Alexandria-ExtraBold.ttf</string>
+		<string>Alexandria-ExtraLight.ttf</string>
+		<string>Alexandria-Light.ttf</string>
+		<string>Alexandria-Medium.ttf</string>
+		<string>Alexandria-Regular.ttf</string>
+		<string>Alexandria-SemiBold.ttf</string>
+		<string>Alexandria-Thin.ttf</string>
+	</array>
+</dict>
+</plist>

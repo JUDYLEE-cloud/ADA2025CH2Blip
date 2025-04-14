@@ -1,0 +1,30 @@
+import Foundation
+import SwiftUI
+
+struct Person: Identifiable, Codable{
+    let id: UUID
+    
+    var nickname: String
+    var path: [CGPoint]
+    var currentPositionIndex: Int
+    var speed: Double
+    var userImageName: String
+    var statusIconName: String?
+    
+    init (
+        nickname: String,
+        path: [CGPoint] = [],
+        currentPositionIndex: Int = 0,
+        speed: Double = 0,
+        userImageName: String = "",
+        statusIconName: String? = nil
+    ) {
+        self.id = UUID()
+        self.nickname = nickname
+        self.path = path
+        self.currentPositionIndex = currentPositionIndex
+        self.speed = speed
+        self.userImageName = userImageName
+        self.statusIconName = statusIconName
+    }
+}

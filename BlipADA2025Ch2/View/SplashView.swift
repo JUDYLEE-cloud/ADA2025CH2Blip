@@ -1,41 +1,54 @@
 import SwiftUI
 
 struct SplashView: View {
-    
     @State private var circleAnimate = false
     @State private var showBlip = false
+    @State private var isActive = false
     
     var body: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
-            
-            VStack {
-                ZStack {
+        if isActive {
+            HomeView()
+        } else {
+            ZStack {
+                Color.black
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ZStack {
                         Circle()
                             .fill(Color(hex: "#4ADD85").opacity(0.7))
                             .frame(width: circleAnimate ? 170 : 100, height: circleAnimate ? 170: 100)
                             .blur(radius: circleAnimate ? 100 : 20)
                             .animation(
                                 .easeOut(duration: 0.5), value: circleAnimate)
-                            .onAppear{
-                                circleAnimate = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {showBlip = true}
-                            }
-                    
+                        
                         Image("mainIcon")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 350)
                             .padding(.leading, 15)
+                    }
+                    
+                    Image("Blip!")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 107, height: 71)
+                        .padding(.top, 10)
+                        .opacity(showBlip ? 1 : 0)
+                }
+            }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    circleAnimate = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        showBlip = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation {
+                                self.isActive = true
+                            }
                         }
-                
-                Image("Blip!")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 107, height: 71)
-                    .padding(.top, 10)
-                    .opacity(showBlip ? 1 : 0)
+                    }
+                }
             }
         }
     }

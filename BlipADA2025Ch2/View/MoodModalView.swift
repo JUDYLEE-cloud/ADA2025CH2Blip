@@ -1,9 +1,27 @@
 import SwiftUI
+import WidgetKit
 
 struct MoodModalView: View {
-    @State private var selectedMood: MoodType = .focus
-    @Binding var selectedMoodIcon: String
+    @State private var selectedMood: MoodType
+
+    init() {
+        let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+        let savedTime = defaults?.object(forKey: "selectedMoodSavedTime") as? Date ?? Date.distantPast
+        let now = Date()
+        
+        if now.timeIntervalSince(savedTime) > 3 * 60 * 60 {
+            defaults?.removeObject(forKey: "selectedMoodType")
+            defaults?.removeObject(forKey: "selectedMoodSavedTime")
+            _selectedMood = State(initialValue: .focus)
+        } else {
+            let storedMoodRaw = defaults?.string(forKey: "selectedMoodType") ?? MoodType.focus.rawValue
+            _selectedMood = State(initialValue: MoodType(rawValue: storedMoodRaw) ?? .focus)
+        }
+    }
+    
+    // @Binding var selectedMoodIcon: String
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = MoodType.focus.rawValue
 
     var body: some View {
         VStack(spacing: 20) {
@@ -44,7 +62,7 @@ struct MoodModalView: View {
                                 .opacity(isSelected ? 1.0 : 0.7)
                         }
                         .padding(.leading, 6)
-                        
+    
                         Spacer()
                     }
                     .padding()
@@ -62,8 +80,25 @@ struct MoodModalView: View {
 
             Spacer()
             
+            // 마지막에 삭제
             Button {
-                selectedMoodIcon = selectedMood.iconName
+                let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+                defaults?.removeObject(forKey: "selectedMoodType")
+                defaults?.removeObject(forKey: "selectedMoodSavedTime")
+                storedMoodType = ""
+                selectedMood = .focus // 내부 화면에서는 focus mode에 테두리
+                WidgetCenter.shared.reloadAllTimelines()
+            } label: {
+                Text("Reset Mood (for Test)")
+                    .foregroundColor(.red)
+                    .padding()
+            }
+            
+            Button {
+                storedMoodType = selectedMood.rawValue
+                let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
+                defaults?.set(Date(), forKey: "selectedMoodSavedTime")
+                WidgetCenter.shared.reloadAllTimelines()
                 dismiss()
             } label: {
                 ZStack {
@@ -84,37 +119,7 @@ struct MoodModalView: View {
     }
 }
 
-enum MoodType: String, CaseIterable, Equatable {
-    case focus
-    case workTalk
-    case openChat
-    
-    var iconName: String {
-        switch self {
-        case .focus: return "RedIcon"
-        case .workTalk: return "YellowIcon"
-        case .openChat: return "GreenIcon"
-        }
-    }
-
-    var title: String {
-        switch self {
-        case .focus: return "Focus Mode"
-        case .workTalk: return "Work Talk Only"
-        case .openChat: return "Open to Any Chat"
-        }
-    }
-    var subtitle: String {
-        switch self {
-        case .focus: return "혼자 집중하는 중이에요.\n급한 일이 아니라면 나중에 이야기해주세요."
-        case .workTalk: return "작업 얘기는 언제든 환영이에요.\n사적인 얘기는 잠시만 미뤄주세요."
-        case .openChat: return "여유로운 시간이에요.\n업무든 일상이든 편하게 이야기해요."
-        }
-    }
-
-    
-}
 
 #Preview {
-    MoodModalView(selectedMoodIcon: .constant("Mascarade"))
+    MoodModalView()
 }
