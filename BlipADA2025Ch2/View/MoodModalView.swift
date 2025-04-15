@@ -115,7 +115,7 @@ struct MoodModalView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.ignoresSafeArea())
+        .background(Color("BackgroundBlack").ignoresSafeArea())
     }
 }
 

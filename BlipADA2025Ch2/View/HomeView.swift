@@ -3,6 +3,9 @@ import SwiftUI
 struct HomeView: View {
     @State private var isMoodModalPresented: Bool = false
     @State private var currentMoodIcon: String = "Mascarade"
+    @State private var scrollProxy: ScrollViewProxy?
+    @State private var mapViewId = UUID()
+    
     @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = ""
     private let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
     
@@ -27,7 +30,8 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            MapView()
+            MapView(scrollProxy: $scrollProxy)
+                .id(mapViewId)
             HomeViewGradation()
             
             VStack {
@@ -63,6 +67,9 @@ struct HomeView: View {
                     Image("LocationButton")
                         .resizable()
                         .frame(width: 80, height: 80)
+                        .onTapGesture {
+                            mapViewId = UUID()
+                        }
                 }
                 .padding(.bottom)
                 .sheet(isPresented: $isMoodModalPresented) {
