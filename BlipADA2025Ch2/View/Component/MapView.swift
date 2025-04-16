@@ -28,7 +28,11 @@ struct MapView: View {
                             Color.clear
                                 .frame(width: 1, height: 1)
                                 .id("targetPoint")
-                                .position(x: 1500, y: 800)
+                                .position(
+                                    viewModel.people.first(where: { $0.isCurrentUser })?.path[
+                                        viewModel.people.first(where: { $0.isCurrentUser })?.currentPositionIndex ?? 0
+                                    ] ?? CGPoint(x: 1500, y: 800)
+                                )
                         )
                         .gesture(
                             MagnifyGesture()
@@ -45,7 +49,9 @@ struct MapView: View {
                         let person = viewModel.people[index]
                         
                         Group {
-                            if let statusIconName = person.statusIconName {
+                            if person.isCurrentUser {
+                                MainUserMapIcon()
+                            } else if let statusIconName = person.statusIconName {
                                 UserMapIcon(userImageName: person.userImageName, statusIconName: statusIconName)
                             } else {
                                 UserMapIcon(userImageName: person.userImageName, statusIconName: nil)
@@ -56,9 +62,9 @@ struct MapView: View {
                         .animation(.linear(duration: 0.02), value: person.path[person.currentPositionIndex])
                     }
                     
-                    MainUserMapIcon()
-                        .position(x: 1500, y: 800)
-                        .scaleEffect(viewModel.zoomScale)
+//                    MainUserMapIcon()
+//                        .position(x: 1500, y: 800)
+//                        .scaleEffect(viewModel.zoomScale)
                 }
                 .onAppear {
                     if !hasScrolled {

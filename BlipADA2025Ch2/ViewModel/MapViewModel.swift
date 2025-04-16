@@ -3,11 +3,16 @@ import SwiftUI
 import Combine
 
 class MapViewModel: ObservableObject {
+    // let firestoreManager = FirestoreManager()
     @Published var people: [Person] = []
     @Published var zoomScale: CGFloat = 1.0
     let timer = Timer.publish(every: 0.02, on: .main, in: .common).autoconnect()
-    
+
     @Published var mapOffset: CGSize = .zero
+    
+    @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip"))
+    var storedMoodType: String = MoodType.focus.rawValue
+    
 
     init() {
         generatePeople()
@@ -16,12 +21,11 @@ class MapViewModel: ObservableObject {
     }
 
     private func generatePeople() {
-        // 유저 추가되면 여기 닉네임 추가
-        let nicknames = ["JudyJ", "Glowny","Taeni", "Ito", "Wonjun", "Air", "Ken"]
+        let nicknames = ["JudyJ", "Glowny", "Taeni", "Ito", "Wonjun", "Air", "Ken"]
         let statusIcons: [String?] = ["RedIcon", "YellowIcon", "GreenIcon", nil]
-        people = (1...nicknames.count).map { index in
-            let nickname = nicknames[index - 1]
-            let userImageName = "User\(index)"
+        people = (0..<nicknames.count).map { index in
+            let nickname = nicknames[index]
+            let userImageName = "User\(index + 1)"
             let randomStatusIcon = statusIcons.randomElement()!
 
             let randomPoint1 = CGPoint(x: CGFloat.random(in: 20...2000), y: CGFloat.random(in: 100...1200))
@@ -31,19 +35,32 @@ class MapViewModel: ObservableObject {
 
             return Person(
                 nickname: nickname,
+                
                 path: randomPath,
                 currentPositionIndex: 0,
                 speed: Double.random(in: 0.08...0.6),
+                waitTimeReamaning: 0,
+                
                 userImageName: userImageName,
-                statusIconName: randomStatusIcon
+                statusIconName: randomStatusIcon,
+                
+                isCurrentUser: index == 0 // 첫 번째 인물은 현재 사용자로 설정
             )
+        }
+        
+        // appstorage에 저장된 감정을 첫번째 인물에게 부여
+        if let mood = MoodType(rawValue: storedMoodType),
+           let currentUserIndex = people.firstIndex(where: { $0.isCurrentUser }) {
+            people[currentUserIndex].statusIconName = mood.iconName
         }
     }
     
     func updatePeoplePositions() {
         for index in people.indices {
             var person = people[index]
-            if !person.path.isEmpty {
+            if person.waitTimeRemaining > 0 {
+                person.waitTimeRemaining -= 0.02 
+            } else if !person.path.isEmpty {
                 let nextIndex = (person.currentPositionIndex + 1) % person.path.count
                 let currentPoint = person.path[person.currentPositionIndex]
                 let nextPoint = person.path[nextIndex]
@@ -59,6 +76,7 @@ class MapViewModel: ObservableObject {
                     person.path[person.currentPositionIndex].y += moveY
                 } else {
                     person.currentPositionIndex = nextIndex
+                    person.waitTimeRemaining = Double.random(in: 5.0 ... 12.0)
                 }
             }
             people[index] = person
