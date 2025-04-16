@@ -30,7 +30,7 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            MapView(scrollProxy: $scrollProxy)
+            MapView()
                 .id(mapViewId)
             HomeViewGradation()
             
@@ -60,15 +60,12 @@ struct HomeView: View {
                             .padding(.leading, currentMoodIcon == "Mascarade" ? 10 : 3)
                             .padding(.top, currentMoodIcon == "Mascarade" ? 0 : 5)
                     }
-                    .onTapGesture {
-                        isMoodModalPresented = true
-                    }
                     
                     Image("LocationButton")
                         .resizable()
                         .frame(width: 80, height: 80)
                         .onTapGesture {
-                            mapViewId = UUID()
+                            NotificationCenter.default.post(name: NSNotification.Name("ScrollToTargetPoint"), object: nil)
                         }
                 }
                 .padding(.bottom)

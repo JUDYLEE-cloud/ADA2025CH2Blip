@@ -3,7 +3,7 @@ import SwiftUI
 struct MapView: View {
     @StateObject private var viewModel = MapViewModel()
     @State private var hasScrolled = false
-    @Binding var scrollProxy: ScrollViewProxy?
+    @State private var scrollProxy: ScrollViewProxy?
     
     var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: false) {
@@ -61,12 +61,9 @@ struct MapView: View {
                         .scaleEffect(viewModel.zoomScale)
                         .animation(.linear(duration: 0.02), value: person.path[person.currentPositionIndex])
                     }
-                    
-//                    MainUserMapIcon()
-//                        .position(x: 1500, y: 800)
-//                        .scaleEffect(viewModel.zoomScale)
                 }
                 .onAppear {
+                    self.scrollProxy = proxy
                     if !hasScrolled {
                         proxy.scrollTo("targetPoint", anchor: .center)
                         hasScrolled = true
@@ -79,9 +76,20 @@ struct MapView: View {
         .onReceive(viewModel.timer) { _ in
             viewModel.updatePeoplePositions()
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("ScrollToTargetPoint"))) { _ in
+            scrollToTargetPoint()
+        }
+    }
+    
+    private func scrollToTargetPoint() {
+        if let proxy = scrollProxy {
+            withAnimation {
+                proxy.scrollTo("targetPoint", anchor: .center)
+            }
+        }
     }
 }
 
 #Preview {
-    MapView(scrollProxy: .constant(nil))
+    MapView()
 }
