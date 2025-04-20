@@ -2,32 +2,12 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var isMoodModalPresented: Bool = false
-    @State private var currentMoodIcon: String = "Mascarade"
+    @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = ""
     @State private var scrollProxy: ScrollViewProxy?
     @State private var mapViewId = UUID()
     @State private var isShowingSetting = false
     
-    @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = ""
     private let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
-    
-    private func updateCurrentMoodIcon() {
-        let savedTime = defaults?.object(forKey: "selectedMoodSavedTime") as? Date ?? Date.distantPast
-        let now = Date()
-        
-        if now.timeIntervalSince(savedTime) > 3 * 60 * 60 {
-            defaults?.removeObject(forKey: "selectedMoodType")
-            defaults?.removeObject(forKey: "selectedMoodSavedTime")
-            currentMoodIcon = "Mascarade"
-        } else {
-            if storedMoodType.isEmpty {
-                currentMoodIcon = "Mascarade"
-            } else if let mood = MoodType(rawValue: storedMoodType) {
-                currentMoodIcon = mood.iconName
-            } else {
-                currentMoodIcon = "Mascarade"
-            }
-        }
-    }
     
     var body: some View {
         NavigationStack {
@@ -67,12 +47,12 @@ struct HomeView: View {
                                 .resizable()
                                 .frame(width: 100, height: 100)
                             
-                            Image(currentMoodIcon)
+                            Image(MoodType(rawValue: storedMoodType)?.iconName ?? "Mascarade")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: currentMoodIcon == "Mascarade" ? 58 : 53)
-                                .padding(.leading, currentMoodIcon == "Mascarade" ? 10 : 3)
-                                .padding(.top, currentMoodIcon == "Mascarade" ? 0 : 5)
+                                .frame(width: MoodType(rawValue: storedMoodType)?.iconName == "Mascarade" ? 58 : 53)
+                                .padding(.leading, MoodType(rawValue: storedMoodType)?.iconName == "Mascarade" ? 10 : 3)
+                                .padding(.top, MoodType(rawValue: storedMoodType)?.iconName == "Mascarade" ? 0 : 5)
                         }
                         .onTapGesture {
                             isMoodModalPresented = true
@@ -95,12 +75,6 @@ struct HomeView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear {
-            updateCurrentMoodIcon()
-        }
-        .onChange(of: storedMoodType) { oldValue, newValue in
-            updateCurrentMoodIcon()
-        }
     }
 }
 

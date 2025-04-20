@@ -8,7 +8,7 @@ struct FriendStatusEntry: TimelineEntry {
 
 struct Provider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> FriendStatusEntry {
-        FriendStatusEntry(date: Date(), friend: sampleFriend)
+        FriendStatusEntry(date: Date(), friend: emptyFriend)
     }
 
     func snapshot(for configuration: FriendStatusConfigurationIntent, in context: Context) async -> FriendStatusEntry {
@@ -18,7 +18,7 @@ struct Provider: AppIntentTimelineProvider {
            let matched = people.first(where: { $0.id.uuidString == selectedFriendId }) {
             friend = matched
         } else {
-            friend = sampleFriend
+            friend = emptyFriend
         }
         return FriendStatusEntry(date: Date(), friend: friend)
     }
@@ -30,7 +30,7 @@ struct Provider: AppIntentTimelineProvider {
            let matched = people.first(where: { $0.id.uuidString == selectedFriendId }) {
             friend = matched
         } else {
-            friend = sampleFriend
+            friend = emptyFriend
         }
         let entry = FriendStatusEntry(date: Date(), friend: friend)
         return Timeline(entries: [entry], policy: .never)
@@ -49,54 +49,67 @@ struct Provider: AppIntentTimelineProvider {
 }
 
 // 샘플 Friend (Preview용)
-let sampleFriend = Person(
-    nickname: "Air",
-    userImageName: "User6",
-    statusIconName: "RedIcon"
+let emptyFriend = Person(
+    nickname: "",
+    userImageName: "",
+    statusIconName: ""
 )
 
 struct BlipWidget2FriendMoodEntryView: View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack(spacing: 7) {
-            HStack {
-                Text(entry.friend.nickname.isEmpty ? "닉네임 없음" : entry.friend.nickname)
-                    .font(.custom("Alexandria-Bold", size: 14))
-                    .foregroundColor(Color(hex: "#0D2481"))
-                
-                Spacer()
-            }
-            
-            ZStack {
-                Image(
-                    entry.friend.statusIconName == "RedIcon" ? "StatusRedBackground" :
-                    entry.friend.statusIconName == "YellowIcon" ? "StatusYellowBackground" :
-                    entry.friend.statusIconName == "GreenIcon" ? "StatusGreenBackground" :
-                    "StatusBackground"
-                )
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                
-                Image(entry.friend.userImageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 82)
-                    .padding(.bottom, 7)
-                
-                if let statusIconName = entry.friend.statusIconName {
-                    Image(statusIconName)
+        Group {
+            VStack(spacing: 7) {
+                if entry.friend.nickname.isEmpty {
+                    Text("📌 Pick your favorite friend\nin the widget settings")
+                        .multilineTextAlignment(.center)
+                        .font(.custom("Alexandria-Bold", size: 14))
+                        .foregroundColor(.gray)
+                } else {
+                    HStack {
+                        Text(entry.friend.nickname)
+                            .font(.custom("Alexandria-Bold", size: 14))
+                            .foregroundColor(Color(hex: "#0D2481"))
+                        
+                        Spacer()
+                    }
+                    
+                    ZStack {
+                        Image(
+                            entry.friend.statusIconName == "RedIcon" ? "StatusRedBackground" :
+                            entry.friend.statusIconName == "YellowIcon" ? "StatusYellowBackground" :
+                            entry.friend.statusIconName == "GreenIcon" ? "StatusGreenBackground" :
+                            "StatusBackground"
+                        )
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 40, height: 40)
-                        .padding(.leading, -55)
-                        .padding(.top, 50)
+                        
+                        Image(entry.friend.userImageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 82)
+                            .padding(.bottom, 7)
+                        
+                        if let statusIconName = entry.friend.statusIconName {
+                            Image(statusIconName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 40, height: 40)
+                                .padding(.leading, -55)
+                                .padding(.top, 50)
+                        }
+                    }
+                    .frame(width: 100, height: 100)
                 }
             }
-            .frame(width: 100, height: 100)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Image("FriendWidgetBackground"))
+        .background(
+            entry.friend.nickname.isEmpty
+            ? nil
+            : Image("FriendWidgetBackground")
+        )
         .containerBackground(.fill.tertiary, for: .widget)
     }
 }
@@ -118,7 +131,7 @@ struct BlipWidget2FriendMood: Widget {
 #Preview("Friend Status Widget", as: .systemSmall) {
     BlipWidget2FriendMood()
 } timeline: {
-    FriendStatusEntry(date: .now, friend: sampleFriend)
+    FriendStatusEntry(date: .now, friend: emptyFriend)
 }
 
 extension Color {

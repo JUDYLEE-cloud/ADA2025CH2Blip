@@ -12,7 +12,7 @@ import SwiftUI
 struct BlipWidget2FriendMoodBundle: WidgetBundle {
     var body: some Widget {
         BlipWidget2FriendMood()
-        BlipWidget2FriendMoodControl()
-        BlipWidget2FriendMoodLiveActivity()
+        // BlipWidget2FriendMoodControl()
+        // BlipWidget2FriendMoodLiveActivity()
     }
 }

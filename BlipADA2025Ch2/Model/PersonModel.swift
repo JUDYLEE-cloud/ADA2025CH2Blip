@@ -21,7 +21,7 @@ struct Person: Identifiable, Codable {
         path: [CGPoint] = [],
         currentPositionIndex: Int = 0,
         speed: Double = 0,
-        waitTimeReamaning: TimeInterval = 0,
+        waitTimeRemaining: TimeInterval = 0,
         
         userImageName: String = "",
         statusIconName: String? = nil,
@@ -33,7 +33,7 @@ struct Person: Identifiable, Codable {
         self.path = path
         self.currentPositionIndex = currentPositionIndex
         self.speed = speed
-        self.waitTimeRemaining = waitTimeReamaning
+        self.waitTimeRemaining = waitTimeRemaining
         
         self.userImageName = userImageName
         self.statusIconName = statusIconName

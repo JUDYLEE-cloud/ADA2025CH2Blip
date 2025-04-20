@@ -7,21 +7,10 @@ struct MoodModalView: View {
     @State private var selectedMood: MoodType
 
     init() {
-        let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
-        let savedTime = defaults?.object(forKey: "selectedMoodSavedTime") as? Date ?? Date.distantPast
-        let now = Date()
-        
-        if now.timeIntervalSince(savedTime) > 3 * 60 * 60 {
-            defaults?.removeObject(forKey: "selectedMoodType")
-            defaults?.removeObject(forKey: "selectedMoodSavedTime")
-            _selectedMood = State(initialValue: .focus)
-        } else {
-            let storedMoodRaw = defaults?.string(forKey: "selectedMoodType") ?? MoodType.focus.rawValue
-            _selectedMood = State(initialValue: MoodType(rawValue: storedMoodRaw) ?? .focus)
-        }
+        let storedMoodRaw = UserDefaults(suiteName: "group.com.ADA2025.blip")?.string(forKey: "selectedMoodType")
+        _selectedMood = State(initialValue: MoodType(rawValue: storedMoodRaw ?? "") ?? .focus)
     }
     
-    // @Binding var selectedMoodIcon: String
     @Environment(\.dismiss) private var dismiss
     @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = MoodType.focus.rawValue
 
@@ -120,9 +109,9 @@ struct MoodModalView: View {
                 WidgetCenter.shared.reloadAllTimelines()
                 
                 // firebase 서버에 저장
-                let email = UserDefaults.standard.string(forKey: "email") ?? ""
-                let password = UserDefaults.standard.string(forKey: "password") ?? ""
-                let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
+//                let email = UserDefaults.standard.string(forKey: "email") ?? ""
+//                let password = UserDefaults.standard.string(forKey: "password") ?? ""
+//                let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
                 Task {
                     do {
                         guard let currentUser = Auth.auth().currentUser else {
@@ -131,7 +120,7 @@ struct MoodModalView: View {
                         }
 
                         let db = Firestore.firestore()
-                        let statusToSave = selectedMood.rawValue
+                        let statusToSave = selectedMood.iconName
                         let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
 
                         let userInfo: [String: Any] = [

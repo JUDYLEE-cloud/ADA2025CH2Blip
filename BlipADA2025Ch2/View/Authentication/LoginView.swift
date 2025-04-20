@@ -26,8 +26,12 @@ struct LoginView: View {
                     
                     VStack(spacing: 35) {
                         TextFieldCustom(title: "Email", text: $viewModel.email)
+                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                         
                         TextFieldCustom(title: "Password", text: $viewModel.password)
+                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                     }
                     
                     Spacer()

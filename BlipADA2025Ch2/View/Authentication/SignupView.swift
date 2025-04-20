@@ -12,7 +12,7 @@ final class AuthViewModel: ObservableObject {
     @Published var nickname = ""
     @Published var email = ""
     @Published var password = ""
-    @AppStorage("nickname") var storedNickname: String = ""
+    @AppStorage("nickname", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) var storedNickname: String = ""
     
     // 회원가입 함수
     func signIn() async -> Bool {
@@ -31,7 +31,8 @@ final class AuthViewModel: ObservableObject {
             let userInfo: [String: Any] = [
                 "uid": returnUserData.uid,
                 "nickname": nickname,
-                "email": email
+                "email": email,
+                "status": ""
             ]
             try await db.collection("users").document(returnUserData.uid).setData(userInfo)
             print("✅ Firestore 저장 성공")
@@ -114,8 +115,14 @@ struct SignUpView: View {
                     
                     VStack(spacing: 35) {
                         TextFieldCustom(title: "NickName", text: $viewModel.nickname)
+                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                         TextFieldCustom(title: "Email", text: $viewModel.email)
+                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                         TextFieldCustom(title: "Password", text: $viewModel.password)
+                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                     }
                     
                     Spacer()

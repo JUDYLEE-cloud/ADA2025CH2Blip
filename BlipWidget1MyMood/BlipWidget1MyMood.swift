@@ -70,7 +70,6 @@ struct BlipMoodWidgetEntryView: View {
                     Image("TripleBackground")
                         .resizable()
                         .frame(width: 130, height: 80)
-                        .border(Color.red, width: 1)
                 } else {
                     ZStack {
                         Image(entry.mood?.backgroundImageName ?? "")

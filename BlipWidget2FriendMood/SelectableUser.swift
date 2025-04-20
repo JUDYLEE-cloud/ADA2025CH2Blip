@@ -1,4 +1,5 @@
 import AppIntents
+import SwiftUI
 
 struct SelectableUser: AppEntity, Identifiable, Hashable {
     var id: String
@@ -14,6 +15,7 @@ struct SelectableUser: AppEntity, Identifiable, Hashable {
 }
 
 struct SelectableUserQuery: EntityQuery {
+    @AppStorage("nickname", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) var storedNickname: String = ""
     func entities(for identifiers: [SelectableUser.ID]) async throws -> [SelectableUser] {
         let all = try await self.allEntities()
         return all.filter { identifiers.contains($0.id) }
@@ -27,9 +29,12 @@ struct SelectableUserQuery: EntityQuery {
         let userDefaults = UserDefaults(suiteName: "group.com.ADA2025.blip") // AppGroup 이름 맞춰줘야 함
         if let data = userDefaults?.data(forKey: "peopleData"),
            let people = try? JSONDecoder().decode([Person].self, from: data) {
-            let selectableUsers = people.map { person in
-                SelectableUser(id: person.id.uuidString, nickname: person.nickname)
-            }
+            _ = storedNickname
+            let selectableUsers = people
+                .filter { $0.nickname != storedNickname }
+                .map { person in
+                    SelectableUser(id: person.id.uuidString, nickname: person.nickname)
+                }
             if !selectableUsers.isEmpty {
                 return selectableUsers
             }
@@ -40,4 +45,9 @@ struct SelectableUserQuery: EntityQuery {
             SelectableUser(id: UUID().uuidString, nickname: "Sample Friend")
         ]
     }
+}
+
+struct UserList: Codable {
+    let id: UUID
+    let nickname: String
 }
