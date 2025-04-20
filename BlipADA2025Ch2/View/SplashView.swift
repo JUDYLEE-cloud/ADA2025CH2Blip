@@ -1,13 +1,20 @@
 import SwiftUI
+import FirebaseAuth
 
 struct SplashView: View {
     @State private var circleAnimate = false
     @State private var showBlip = false
     @State private var isActive = false
     
+    @State private var isLoggedIn = false
+    
     var body: some View {
         if isActive {
-            HomeView()
+            if isLoggedIn {
+                HomeView()
+            } else {
+                LoginView()
+            }
         } else {
             ZStack {
                 Color.black
@@ -45,6 +52,7 @@ struct SplashView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation {
                                 self.isActive = true
+                                self.isLoggedIn = Auth.auth().currentUser != nil
                             }
                         }
                     }

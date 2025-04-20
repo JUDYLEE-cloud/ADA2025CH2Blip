@@ -5,6 +5,7 @@ struct HomeView: View {
     @State private var currentMoodIcon: String = "Mascarade"
     @State private var scrollProxy: ScrollViewProxy?
     @State private var mapViewId = UUID()
+    @State private var isShowingSetting = false
     
     @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = ""
     private let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
@@ -29,51 +30,71 @@ struct HomeView: View {
     }
     
     var body: some View {
-        ZStack {
-            MapView()
-                .id(mapViewId)
-            HomeViewGradation()
-            
-            VStack {
-                HStack {
-                    Spacer()
-                    Image("Setting")
-                        .padding(.trailing, 15)
-                }
+        NavigationStack {
+            ZStack {
+                MapView()
+                    .id(mapViewId)
+                HomeViewGradation()
                 
-                Spacer()
-                
-                HStack(alignment: .bottom, spacing: 14) {
-                    Image("Search")
-                        .resizable()
-                        .frame(width: 80, height: 80)
-                    
-                    ZStack {
-                        Image("MainButton")
-                           .resizable()
-                           .frame(width: 100, height: 100)
-                           
-                        Image(currentMoodIcon)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: currentMoodIcon == "Mascarade" ? 58 : 53)
-                            .padding(.leading, currentMoodIcon == "Mascarade" ? 10 : 3)
-                            .padding(.top, currentMoodIcon == "Mascarade" ? 0 : 5)
+                VStack {
+                    HStack {
+                        Spacer()
+                        
+                        Image("Setting")
+                            .padding(.trailing, 15)
+                            .onTapGesture {
+                                isShowingSetting = true
+                            }
                     }
                     
-                    Image("LocationButton")
-                        .resizable()
-                        .frame(width: 80, height: 80)
-                        .onTapGesture {
-                            NotificationCenter.default.post(name: NSNotification.Name("ScrollToTargetPoint"), object: nil)
-                        }
+                    Spacer()
                 }
-                .padding(.bottom)
+                
+                VStack {
+                    Spacer()
+                    
+                    HStack(alignment: .bottom, spacing: 14) {
+                        Button {
+                            print("search 클릭됨")
+                        } label: {
+                            Image("Search")
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                        }
+                        
+                        ZStack {
+                            Image("MainButton")
+                                .resizable()
+                                .frame(width: 100, height: 100)
+                            
+                            Image(currentMoodIcon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: currentMoodIcon == "Mascarade" ? 58 : 53)
+                                .padding(.leading, currentMoodIcon == "Mascarade" ? 10 : 3)
+                                .padding(.top, currentMoodIcon == "Mascarade" ? 0 : 5)
+                        }
+                        .onTapGesture {
+                            isMoodModalPresented = true
+                        }
+                        
+                        Image("LocationButton")
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                            .onTapGesture {
+                                NotificationCenter.default.post(name: NSNotification.Name("ScrollToTargetPoint"), object: nil)
+                            }
+                    }
+                }
                 .sheet(isPresented: $isMoodModalPresented) {
                     MoodModalView()
                 }
+                .navigationDestination(isPresented: $isShowingSetting) {
+                    SettingView()
+                }
             }
         }
+        .navigationBarHidden(true)
         .onAppear {
             updateCurrentMoodIcon()
         }

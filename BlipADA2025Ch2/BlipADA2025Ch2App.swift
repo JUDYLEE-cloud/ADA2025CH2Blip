@@ -1,14 +1,23 @@
 import SwiftUI
 import FirebaseCore
 import Firebase
+import FirebaseAuth
 
 @main
 struct BlipADA2025Ch2App: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+
     var body: some Scene {
         WindowGroup {
-            SplashView()
+            NavigationStack {
+                if isLoggedIn {
+                    HomeView()
+                } else {
+                    LoginView()
+                }
+            }
         }
     }
 }

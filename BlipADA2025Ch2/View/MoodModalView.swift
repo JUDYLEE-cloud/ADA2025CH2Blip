@@ -1,5 +1,7 @@
 import SwiftUI
 import WidgetKit
+import FirebaseFirestore
+import FirebaseAuth
 
 struct MoodModalView: View {
     @State private var selectedMood: MoodType
@@ -80,14 +82,31 @@ struct MoodModalView: View {
 
             Spacer()
             
-            // 마지막에 삭제
+            // 감정 삭제
             Button {
                 let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
                 defaults?.removeObject(forKey: "selectedMoodType")
                 defaults?.removeObject(forKey: "selectedMoodSavedTime")
                 storedMoodType = ""
                 selectedMood = .focus // 내부 화면에서는 focus mode에 테두리
+                // 위젯에 반영
                 WidgetCenter.shared.reloadAllTimelines()
+
+                // firebase db에도 반영
+                Task {
+                    do {
+                        guard let currentUser = Auth.auth().currentUser else {
+                            print("❌ 현재 로그인된 사용자가 없습니다")
+                            return
+                        }
+
+                        let db = Firestore.firestore()
+                        try await db.collection("users").document(currentUser.uid).setData(["status": ""], merge: true)
+                        print("✅ Firestore에서 status 초기화 성공")
+                    } catch {
+                        print("❌ Firestore status 초기화 실패: \(error)")
+                    }
+                }
             } label: {
                 Text("Reset Mood (for Test)")
                     .foregroundColor(.red)
@@ -95,10 +114,44 @@ struct MoodModalView: View {
             }
             
             Button {
+                // app storage에 저장
                 storedMoodType = selectedMood.rawValue
-                let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
-                defaults?.set(Date(), forKey: "selectedMoodSavedTime")
+                // 위젯에 반영 app storage
                 WidgetCenter.shared.reloadAllTimelines()
+                
+                // firebase 서버에 저장
+                let email = UserDefaults.standard.string(forKey: "email") ?? ""
+                let password = UserDefaults.standard.string(forKey: "password") ?? ""
+                let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
+                Task {
+                    do {
+                        guard let currentUser = Auth.auth().currentUser else {
+                            print("❌ 현재 로그인된 사용자가 없습니다")
+                            return
+                        }
+
+                        let db = Firestore.firestore()
+                        let statusToSave = selectedMood.rawValue
+                        let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
+
+                        let userInfo: [String: Any] = [
+                            "status": statusToSave,
+                            "nickname": nickname
+                        ]
+
+                        print("🔥 저장 전 정보: \(userInfo)")
+
+                        try await db.collection("users").document(currentUser.uid).setData(userInfo, merge: true)
+
+                        print("✅ Firestore에 status 저장 성공")
+                        WidgetCenter.shared.reloadAllTimelines()
+                        dismiss()
+                    } catch {
+                        print("❌ Firestore 저장 실패: \(error)")
+                    }
+                }
+                
+                // 모달 뷰 종료
                 dismiss()
             } label: {
                 ZStack {

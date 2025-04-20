@@ -41,12 +41,13 @@ struct Provider: TimelineProvider {
 
 struct BlipMoodWidgetEntryView: View {
     var entry: MoodEntry
+    @AppStorage("nickname", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) var storedNickname: String = "My"
     
     var body: some View {
         ZStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
-                    Text("JudyJ's Mood")
+                    Text("\(storedNickname)'s Mood")
                         .font(.custom("Alexandria-Medium", size: 12))
                         .foregroundColor(Color(hex: "707070"))
                     Spacer()
