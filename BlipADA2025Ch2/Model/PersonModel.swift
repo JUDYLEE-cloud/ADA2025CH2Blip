@@ -13,6 +13,7 @@ struct Person: Identifiable, Codable {
     
     var userImageName: String
     var statusIconName: String?
+    
     var isCurrentUser: Bool // 추후 삭제?
     
     init (

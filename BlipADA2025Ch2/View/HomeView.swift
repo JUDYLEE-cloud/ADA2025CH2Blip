@@ -69,7 +69,7 @@ struct HomeView: View {
                 .sheet(isPresented: $isMoodModalPresented) {
                     MoodModalView()
                 }
-                .navigationDestination(isPresented: $isShowingSetting) {
+                .fullScreenCover(isPresented: $isShowingSetting) {
                     SettingView()
                 }
             }

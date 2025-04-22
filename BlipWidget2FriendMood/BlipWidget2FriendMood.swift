@@ -49,6 +49,7 @@ struct Provider: AppIntentTimelineProvider {
 }
 
 // 샘플 Friend (Preview용)
+// :: 위젯-서버 연결되나, 실시간으로 바뀌나 수정
 let emptyFriend = Person(
     nickname: "",
     userImageName: "",

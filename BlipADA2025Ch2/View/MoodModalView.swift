@@ -12,6 +12,7 @@ struct MoodModalView: View {
     }
     
     @Environment(\.dismiss) private var dismiss
+    // :: app storage key를 넣어서 관리해보기
     @AppStorage("selectedMoodType", store: UserDefaults(suiteName: "group.com.ADA2025.blip")) private var storedMoodType: String = MoodType.focus.rawValue
 
     var body: some View {

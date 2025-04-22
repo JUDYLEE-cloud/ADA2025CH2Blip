@@ -32,10 +32,9 @@ enum MoodType: String, CaseIterable, Equatable, AppEnum {
     
     static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Mood")
 
-        static var caseDisplayRepresentations: [MoodType: DisplayRepresentation] = [
+    static var caseDisplayRepresentations: [MoodType: DisplayRepresentation] = [
             .focus: .init(title: "집중 모드"),
             .workTalk: .init(title: "작업 얘기만"),
-            .openChat: .init(title: "편하게 대화"),
-            // .reset: .init(title: "감정 초기화") ❌ 지금은 주석 처리되어 있어서 생략
-        ]
+            .openChat: .init(title: "편하게 대화")
+    ]
 }

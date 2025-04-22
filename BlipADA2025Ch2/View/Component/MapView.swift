@@ -51,10 +51,8 @@ struct MapView: View {
                         Group {
                             if person.isCurrentUser {
                                 MainUserMapIcon()
-                            } else if let statusIconName = person.statusIconName {
-                                UserMapIcon(userImageName: person.userImageName, statusIconName: statusIconName)
                             } else {
-                                UserMapIcon(userImageName: person.userImageName, statusIconName: nil)
+                                UserMapIcon(userImageName: person.userImageName, statusIconName: person.statusIconName)
                             }
                         }
                         .position(person.path[person.currentPositionIndex])

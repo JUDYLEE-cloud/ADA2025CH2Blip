@@ -7,6 +7,7 @@ import FirebaseAuth
 // 조건 불충족시 버튼 비활성화
 // 이메일은 꼭 이메일 형식, 비밀번호는 6글자 이상이여야 한다는 조건
 
+// 파일 분리
 @MainActor
 final class AuthViewModel: ObservableObject {
     @Published var nickname = ""
@@ -59,6 +60,7 @@ final class AuthViewModel: ObservableObject {
             let snapshot = try await db.collection("users").document(returnUserData.uid).getDocument()
             if let data = snapshot.data(), let nickname = data["nickname"] as? String {
                 storedNickname = nickname
+                UserDefaults.standard.set(nickname, forKey: "nickname")
                 print("✅ AppStorage에 저장된 닉네임: \(storedNickname)")
             }
 
@@ -73,6 +75,11 @@ final class AuthViewModel: ObservableObject {
     func logout() {
         do {
             try Auth.auth().signOut()
+            
+            UserDefaults.standard.removeObject(forKey: "email")
+            UserDefaults.standard.removeObject(forKey: "password")
+            UserDefaults.standard.removeObject(forKey: "nickname")
+            storedNickname = ""
 
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                 windowScene.windows.first?.rootViewController = UIHostingController(rootView: SplashView())
