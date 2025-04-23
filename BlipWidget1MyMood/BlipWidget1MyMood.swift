@@ -3,7 +3,7 @@ import SwiftUI
 
 struct MoodEntry: TimelineEntry {
     let date: Date
-    let mood: MoodType?
+    let mood: MoodTypeModel?
 }
 
 struct Provider: TimelineProvider {
@@ -26,12 +26,12 @@ struct Provider: TimelineProvider {
         completion(timeline)
     }
     
-    private func readStoredMood() -> MoodType? {
+    private func readStoredMood() -> MoodTypeModel? {
         let defaults = UserDefaults(suiteName: "group.com.ADA2025.blip")
         
         guard let storedMoodType = defaults?.string(forKey: "selectedMoodType"),
               !storedMoodType.isEmpty,
-              let mood = MoodType(rawValue: storedMoodType) else {
+              let mood = MoodTypeModel(rawValue: storedMoodType) else {
             return nil
         }
         
@@ -112,7 +112,7 @@ struct BlipWidget1MyMood: Widget {
 }
 
 
-extension MoodType {
+extension MoodTypeModel {
     var backgroundImageName: String {
         switch self {
         case .focus:
