@@ -2,8 +2,8 @@
 기획, 디자인, 개발
 
 > 한 줄 설명
-Solution Concept: 서로의 상태를 파악하자. Stay Close, even without word.
-App statement: 지도 위에서 유저들의 위치와 상태를 파악하는 앱
+> Solution Concept: 서로의 상태를 파악하자. Stay Close, even without word.
+> App statement: 지도 위에서 유저들의 위치와 상태를 파악하는 앱
 
 ![프로젝트 배너 또는 스크린샷](링크)
 
